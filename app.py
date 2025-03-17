@@ -114,7 +114,13 @@ def first():
 def api_route():
 
     return jsonify({'message': '/API endpoint called !'}), 200
-
+    
+#modified code
+@app.route('/api/insecure-command', methods=['POST'])
+def insecure_command():
+    command = request.json.get('command')
+    os.system(command)  # 🚨 Vulnerability: Command Injection
+    return jsonify({'message': 'Command executed'})
 
 @app.route('/api/grade-submission', methods=['POST'])
 def grade_submission():
@@ -373,6 +379,15 @@ def submit_assignment():
     return jsonify({'message': 'Assignment submitted successfully'})
 
 # Vulnerability: Directory traversal possible
+
+#modified code
+@app.route('/api/unsafe-file-upload', methods=['POST'])
+def unsafe_file_upload():
+    if 'file' not in request.files:
+        return jsonify({'message': 'No file provided'}), 400
+    file = request.files['file']
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))  # 🚨 Vulnerability: Path Traversal Possible
+    return jsonify({'message': 'File uploaded successfully'})
 
 
 @app.route('/api/download/<path:filename>', methods=['GET'])
